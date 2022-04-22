@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "dist/prospect-names",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
