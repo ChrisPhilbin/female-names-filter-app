@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import readXlsxFile from 'read-excel-file';
 import writeXlsxFile from 'write-excel-file';
-import { femaleNames } from './util/names';
+import { femaleNames, maleNames } from './util/names';
 import { getFormattedDate } from './util/dateGenerator';
 import { MessageService } from 'primeng/api';
 
@@ -12,12 +12,13 @@ import { MessageService } from 'primeng/api';
   providers: [MessageService],
 })
 export class AppComponent implements OnInit {
-  title = 'Identify Female Names';
+  title = 'Filter Prospect Names';
   hasErrors: boolean = false;
   isConverting: boolean = false;
   tableHeader: string[][] = [];
   canClick: boolean = false;
   displayModal: boolean = false;
+  selectedSex: string = '';
 
   constructor(private messageService: MessageService) {}
 
@@ -26,6 +27,8 @@ export class AppComponent implements OnInit {
   }
 
   throwError(message: string) {
+    this.isConverting = false;
+    this.hasErrors = true;
     this.messageService.add({
       severity: 'error',
       summary: 'Something went wrong!',
@@ -33,8 +36,29 @@ export class AppComponent implements OnInit {
     });
   }
 
-  enableButton() {
-    this.canClick = true;
+  generateTableHeader(tableHeader): string[] {
+    let headerRow = [];
+    tableHeader.forEach((row) => {
+      row.forEach((cell) => {
+        let tempCell = {
+          value: cell,
+          fontWeight: 'bold',
+        };
+        headerRow.push(tempCell);
+      });
+    });
+    return headerRow;
+  }
+
+  generateTableRows(row): string[] {
+    let tempRow = [];
+    row.forEach((cell) => {
+      let tempCell = {
+        value: cell,
+      };
+      tempRow.push(tempCell);
+    });
+    return tempRow;
   }
 
   handleClick() {
@@ -43,17 +67,24 @@ export class AppComponent implements OnInit {
     let input: HTMLInputElement = <HTMLInputElement>(
       document.getElementById('prospectFile')
     );
-    let femaleNamesArr = [];
+    let namesArr = [];
     let firstNameColumn: number;
     let contactIdColumn: number;
     let emailColumn: number;
     let newArr = [];
+    let filter;
+
+    if (!this.selectedSex) {
+      this.throwError('Please selected male or female');
+      throw new Error('Sex was not selected from dropdown element');
+    }
+
+    this.selectedSex === 'female'
+      ? (filter = femaleNames)
+      : (filter = maleNames);
 
     if (!input.files[0]) {
       this.throwError('Must include file to convert!');
-      this.isConverting = false;
-      this.hasErrors = true;
-      throw new Error('No file provided.');
     }
 
     readXlsxFile(input.files[0])
@@ -62,7 +93,6 @@ export class AppComponent implements OnInit {
           if (rowIndex === 0) {
             this.tableHeader.push(row);
             row.forEach((cell: string, cellIndex) => {
-              console.log(cell, 'current header cell');
               if (cell.toUpperCase() === 'FIRST NAME') {
                 firstNameColumn = cellIndex;
               }
@@ -77,69 +107,42 @@ export class AppComponent implements OnInit {
             });
 
             if (!firstNameColumn) {
-              this.hasErrors = true;
-              this.isConverting = false;
               this.throwError('Unable to detect First Name column.');
-              throw new Error('First Name column not found!');
             }
 
             if (!contactIdColumn && !emailColumn) {
-              this.hasErrors = true;
-              this.isConverting = false;
               this.throwError('Missing either Contact ID or Email column');
-              throw new Error(
-                'Spreadsheet must either have contactId or prospect email field!'
-              );
             }
           } else {
             if (
               row[firstNameColumn] &&
-              femaleNames.includes(row[firstNameColumn].toUpperCase())
+              filter.includes(row[firstNameColumn].toUpperCase())
             ) {
-              femaleNamesArr.push(row);
+              namesArr.push(row);
             }
           }
         });
       })
       .then(() => {
         if (!this.hasErrors) {
-          let headerRow = [];
-          this.tableHeader.forEach((row) => {
-            row.forEach((cell) => {
-              let tempCell = {
-                value: cell,
-                fontWeight: 'bold',
-              };
-              headerRow.push(tempCell);
-            });
-          });
-          newArr.push(headerRow);
-          femaleNamesArr.forEach((row) => {
-            let tempRow = [];
-            row.forEach((cell) => {
-              let tempCell = {
-                value: cell,
-              };
-              tempRow.push(tempCell);
-            });
+          newArr.push(this.generateTableHeader(this.tableHeader));
+          namesArr.forEach((row) => {
+            let tempRow = this.generateTableRows(row);
             newArr.push(tempRow);
           });
           //@ts-ignore
           writeXlsxFile(newArr, {
-            fileName: `WIB_Filtered_List_${getFormattedDate()}.xlsx`,
+            fileName: `filtered_list_${
+              this.selectedSex
+            }_names_${getFormattedDate()}.xlsx`,
             dateFormat: 'mm/dd/yyyy',
           });
           this.isConverting = false;
         } else {
-          this.hasErrors = true;
-          this.isConverting = false;
           this.throwError('Something went wrong!');
-          throw new Error('Something unexpected went wrong!');
         }
       })
       .catch((error) => {
-        this.hasErrors = true;
-        this.isConverting = false;
         this.throwError('Something unexpected went wrong!');
         throw new Error(error);
       });

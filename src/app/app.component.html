@@ -1,22 +1,27 @@
 <div class="text-center pt-8 min-h-screen mb-auto">
   <img src="/assets/images/UKG-tagline_rgb.png" class="h-1/4 w-1/4 ml-auto mr-auto mb-4">
-  <p class="text-3xl font-bold">Filter prospect list for WIB Summit</p>
-  <input type="file" id="prospectFile" class="pt-4" (click)="enableButton()"><br>
+  <p class="text-3xl font-bold">Filter prospect list by male or female names</p>
+  <input type="file" id="prospectFile" class="pt-4" (click)="canClick = true"><br>
+  <select [(ngModel)]="selectedSex" class="mt-5 rounded-lg">
+    <option value="">-- Male or Female? --</option>
+    <option value="male">Leave only male names</option>
+    <option value="female">Leave only female names</option>
+  </select><br>
   <button [disabled]="!canClick" [ngClass]="!canClick? 'cursor-not-allowed' : ''" class="bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-4 mt-10" (click)="handleClick()">Filter names</button><br />
   <p-progressSpinner [style]="{'margin-top':'20px'}" *ngIf="isConverting && !hasErrors"></p-progressSpinner>
 </div>
 <app-footer></app-footer>
 <p-toast></p-toast>
 <p-dialog header="Hey, Fellow Ukrewer!" [(visible)]="displayModal" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="10000"
-    [draggable]="false" [resizable]="false">
+    [draggable]="true" [resizable]="false">
     <p class="p-m-0">
-      This app will help you take an export from Salesforce and return only female names - great for Women In Business (WIB) events!<br />
+      This app will help you take an export from Salesforce and filter by either male or female names<br />
       <br />
       <mark><strong>AFTER EXPORTING FROM SALESFORCE BE SURE TO FIRST OPEN THE FILE IN EXCEL AND SIMPLY RE-SAVE IT</strong><br />
       <strong>Skipping this step will cause errors and the app will likely not work properly for you.</strong><br /></mark>
       <br />
       <strong>A couple of things to note:</strong><br />
-      <li>This app will identify most female names (About 90%).</li>
+      <li>This app will identify most male/female names (About 90%).</li>
       <li>Keep in mind some names can be both male or female.</li>
       <li>Your export MUST include the prospect's First Name.</li>
       <li>Your export MUST include either the Contact ID or Email column.</li>
