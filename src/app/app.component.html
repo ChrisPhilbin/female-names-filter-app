@@ -7,7 +7,9 @@
     <option value="male">Leave only male names</option>
     <option value="female">Leave only female names</option>
   </select><br>
-  <button [disabled]="!canClick" [ngClass]="!canClick? 'cursor-not-allowed' : ''" class="bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-4 mt-10" (click)="handleClick()">Filter names</button><br />
+  <div [tooltipDisabled]="canClick && !!selectedSex" pTooltip="Make sure you have provided a file to convert and have selected to filter by either male or female names" tooltipPosition="top">
+    <button [disabled]="!canClick" [ngClass]="!canClick? 'cursor-not-allowed' : ''" class="bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-4 mt-10" (click)="handleClick()">Filter names</button><br />
+  </div>
   <p-progressSpinner [style]="{'margin-top':'20px'}" *ngIf="isConverting && !hasErrors"></p-progressSpinner>
 </div>
 <app-footer></app-footer>

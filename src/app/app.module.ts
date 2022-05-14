@@ -11,6 +11,7 @@ import { FooterComponent } from './footer/footer.component';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
   declarations: [AppComponent, FooterComponent],
@@ -23,6 +24,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     DialogModule,
     ButtonModule,
     ProgressSpinnerModule,
+    TooltipModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
