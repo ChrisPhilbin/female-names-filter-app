@@ -12,9 +12,10 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
+import { RecapsGeneratorComponent } from './components/recaps-generator/recaps-generator.component';
 
 @NgModule({
-  declarations: [AppComponent, FooterComponent],
+  declarations: [AppComponent, FooterComponent, RecapsGeneratorComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
