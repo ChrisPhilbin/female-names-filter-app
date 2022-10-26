@@ -11,11 +11,18 @@ import { FooterComponent } from './footer/footer.component';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { AccordionModule } from 'primeng/accordion';
 import { TooltipModule } from 'primeng/tooltip';
 import { RecapsGeneratorComponent } from './components/recaps-generator/recaps-generator.component';
+import { ProspectNamesFilterComponent } from './components/prospect-names-filter/prospect-names-filter.component';
 
 @NgModule({
-  declarations: [AppComponent, FooterComponent, RecapsGeneratorComponent],
+  declarations: [
+    AppComponent,
+    FooterComponent,
+    RecapsGeneratorComponent,
+    ProspectNamesFilterComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -25,6 +32,7 @@ import { RecapsGeneratorComponent } from './components/recaps-generator/recaps-g
     DialogModule,
     ButtonModule,
     ProgressSpinnerModule,
+    AccordionModule,
     TooltipModule,
   ],
   providers: [],

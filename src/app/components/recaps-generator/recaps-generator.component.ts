@@ -11,34 +11,29 @@ import readXlsxFile from 'read-excel-file';
 export class RecapsGeneratorComponent implements OnInit {
   constructor(private messageService: MessageService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    document.title = this.title;
+  }
 
   title = 'BDR Recap Generator';
   canClick: boolean = false;
   hasErrors: boolean = false;
   isConverting: boolean = false;
   tableHeader: string[][] = [];
-
-  throwError(message: string) {
-    this.isConverting = false;
-    this.hasErrors = true;
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Something went wrong!',
-      detail: message,
-    });
-  }
+  hasFormattedRecap: boolean = false;
+  formattedRecap = [];
+  columns = {
+    accountNameColumn: null,
+    prospectNameColumn: null,
+    prospectTitleColum: null,
+    commentsColumn: null,
+    subjectColumn: null,
+    activityTypeColumn: null,
+    salesRepColum: null,
+  };
 
   generateRecap() {
     this.hasErrors = false;
-
-    let accountNameColumn: number;
-    let prospectNameColumn: number;
-    let prospectTitleColum: number;
-    let subjectColum: number;
-    let activityTypeColumn: number;
-    let salesRepColum: number;
-    let formattedRecap = {};
 
     let input: HTMLInputElement = <HTMLInputElement>(
       document.getElementById('recapFile')
@@ -48,58 +43,165 @@ export class RecapsGeneratorComponent implements OnInit {
         'No recap file provided. Please make sure you select a valid recap file!'
       );
     }
-    return null;
 
-    readXlsxFile(input[0]).then((rows) => {
-      rows.forEach((row: string[], rowIndex = 0) => {
-        if (rowIndex === 0) {
-          //identify columns of created date, account name,
-          // prospect name (name), prospect title, comments, subject, rep name (account owner)
-          //activity type
-          row.forEach((cell: string, cellIndex) => {
-            if (cell.toUpperCase() === 'COMPANY / ACCOUNT') {
-              accountNameColumn = cellIndex;
-            }
+    readXlsxFile(input.files[0])
+      .then((rows) => {
+        rows.forEach((row: string[], rowIndex = 0) => {
+          if (rowIndex === 0) {
+            row.forEach((cell: string, cellIndex) => {
+              if (cell.toUpperCase() === 'COMPANY / ACCOUNT') {
+                this.columns.accountNameColumn = cellIndex;
+              }
 
-            if (cell.toUpperCase() === 'NAME') {
-              prospectNameColumn = cellIndex;
-            }
+              if (cell.toUpperCase() === 'NAME') {
+                this.columns.prospectNameColumn = cellIndex;
+              }
 
-            if (cell.toUpperCase() === 'TITLE') {
-              prospectTitleColum = cellIndex;
-            }
+              if (cell.toUpperCase() === 'TITLE') {
+                this.columns.prospectTitleColum = cellIndex;
+              }
 
-            if (cell.toUpperCase() === 'SUBJECT') {
-              subjectColum = cellIndex;
-            }
+              if (cell.toUpperCase() === 'COMMENTS') {
+                this.columns.commentsColumn = cellIndex;
+              }
 
-            if (cell.toUpperCase() === 'ACTIVITY TYPE') {
-              activityTypeColumn = cellIndex;
-            }
+              if (cell.toUpperCase() === 'SUBJECT') {
+                this.columns.subjectColumn = cellIndex;
+              }
 
-            if (cell.toUpperCase() === 'ACCOUNT OWNER') {
-              salesRepColum = cellIndex;
-            }
+              if (cell.toUpperCase() === 'ACTIVITY TYPE') {
+                this.columns.activityTypeColumn = cellIndex;
+              }
 
+              if (cell.toUpperCase() === 'ACCOUNT OWNER') {
+                this.columns.salesRepColum = cellIndex;
+              }
+            });
+          } else {
             if (
-              !accountNameColumn ||
-              !prospectNameColumn ||
-              !prospectTitleColum ||
-              !subjectColum ||
-              !activityTypeColumn ||
-              !salesRepColum
+              !this.columns.accountNameColumn ||
+              !this.columns.prospectNameColumn ||
+              !this.columns.prospectTitleColum ||
+              !this.columns.subjectColumn ||
+              !this.columns.activityTypeColumn ||
+              !this.columns.commentsColumn ||
+              !this.columns.salesRepColum
             ) {
               this.throwError(
                 'The provided file does not have the proper table headers.'
               );
+              return;
             }
-          });
-        } else {
-          //going thru the remainder of the cells
-          //AFTER the first one containing headers
-          //setup shape of recap object
-        }
+
+            let repIndex = this.formattedRecap.findIndex((recap) => {
+              return recap.salesRep === row[this.columns.salesRepColum];
+            });
+            if (repIndex === -1) {
+              this.formattedRecap.push({
+                id: `recap-id-${rowIndex}`,
+                salesRep: row[this.columns.salesRepColum],
+                allActivities: {
+                  spokes: [],
+                  meetings: [],
+                  emailResponses: [],
+                  profiling: [],
+                  rsvps: [],
+                  other: [],
+
+                  // {
+                  //   accountName: row[accountNameColumn],
+                  //   prospectName: row[prospectNameColumn],
+                  //   prospectTitle: row[prospectTitleColum],
+                  //   activitySubject: row[subjectColumn],
+                  //   activityComments: row[commentsColumn],
+                  //   activityType: row[activityTypeColumn],
+                  //   salesRep: row[salesRepColum],
+                  // },
+                },
+              });
+            }
+            if (row[this.columns.subjectColumn].includes('Meeting')) {
+              this.formattedRecap[repIndex].allActivities.meetings.push(
+                this.createActivityObject(row)
+              );
+            } else if (
+              row[this.columns.subjectColumn].includes('[Spoke No Interest]') ||
+              row[this.columns.subjectColumn].includes('Other') ||
+              row[this.columns.subjectColumn].includes('Call Back')
+            ) {
+              this.formattedRecap[repIndex].allActivities.spokes.push(
+                this.createActivityObject(row)
+              );
+            } else if (row[this.columns.subjectColumn].includes('[In]')) {
+              this.formattedRecap[repIndex].allActivities.emailResponses.push(
+                this.createActivityObject(row)
+              );
+            } else if (
+              row[this.columns.subjectColumn].includes('[Profiling]')
+            ) {
+              this.formattedRecap[repIndex].allActivities.profiling.push(
+                this.createActivityObject(row)
+              );
+            } else if (row[this.columns.subjectColumn].includes('RSVP')) {
+              this.formattedRecap[repIndex].allActivities.rsvps.push(
+                this.createActivityObject(row)
+              );
+            } else {
+              this.formattedRecap[repIndex].allActivities.other.push(
+                this.createActivityObject(row)
+              );
+            }
+          }
+        });
+      })
+      .then(() => {
+        console.log(this.formattedRecap, 'formatted recap.');
+        this.hasFormattedRecap = true;
+      })
+      .catch((error) => {
+        console.log(error, 'Something went wrong.');
+        this.throwError('Something unexpected happened. Please try again.');
       });
+  }
+
+  createActivityObject(activityRow) {
+    return {
+      accountName: activityRow[this.columns.accountNameColumn],
+      prospectName: activityRow[this.columns.prospectNameColumn],
+      prospectTitle: activityRow[this.columns.prospectTitleColum],
+      activitySubject: activityRow[this.columns.subjectColumn],
+      activityComments: activityRow[this.columns.commentsColumn],
+      activityType: activityRow[this.columns.activityTypeColumn],
+      salesRep: activityRow[this.columns.salesRepColum],
+    };
+  }
+
+  copyRecapToClipboard(recapId: string, repName: string): void {
+    const recapToCopy = document.getElementById(recapId).innerHTML;
+    const listener = (e) => {
+      e.clipboardData.setData('text/html', recapToCopy);
+      e.clipboardData.setData('text/plain', recapToCopy);
+      e.preventDefault();
+    };
+
+    document.addEventListener('copy', listener);
+    document.execCommand('copy');
+    document.removeEventListener('copy', listener);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success!',
+      detail: `Copied recap for ${repName} to the clipboard!`,
+    });
+  }
+
+  throwError(message: string) {
+    this.isConverting = false;
+    this.hasErrors = true;
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Something went wrong!',
+      detail: message,
     });
   }
 }

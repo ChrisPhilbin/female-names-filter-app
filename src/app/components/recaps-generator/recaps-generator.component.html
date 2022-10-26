@@ -1,4 +1,4 @@
-<div class="text-center pt-8 min-h-screen mb-auto">
+<div class="text-center pt-8 min-h-screen mb-auto" *ngIf="!hasFormattedRecap">
   <input
     type="file"
     id="recapFile"
@@ -14,3 +14,36 @@
     Generate Recap</button
   ><br />
 </div>
+
+<div
+  class="text-center pt-8 min-h-screen mb-auto w-2/4 mx-auto"
+  *ngIf="hasFormattedRecap"
+>
+  <h1>Recap formatting complete!</h1>
+  <p-accordion [multiple]="true">
+    <p-accordionTab
+      *ngFor="let recap of formattedRecap"
+      [header]="recap.salesRep"
+    >
+      <div class="text-right">
+        <button
+          (click)="copyRecapToClipboard(recap.id, recap.salesRep)"
+          class="block bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-4 mt-10"
+        >
+          Copy to clipboard
+        </button>
+      </div>
+      <div [id]="recap.id" class="text-left">
+        <span *ngFor="let activity of recap.allActivities">
+          <p class="font-bold inline">
+            {{ activity.accountName }} - {{ activity.prospectName }} -
+            {{ activity.prospectTitle }} - {{ activity.activitySubject }} -
+          </p>
+          {{ activity.activityComments }}<br />
+          &nbsp;<br />
+        </span>
+      </div>
+    </p-accordionTab>
+  </p-accordion>
+</div>
+<p-toast></p-toast>
