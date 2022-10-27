@@ -1,4 +1,8 @@
-<div class="text-center pt-8 min-h-screen mb-auto" *ngIf="!hasFormattedRecap">
+<div
+  class="text-center pt-8 min-h-screen mb-auto pt-44"
+  *ngIf="!hasFormattedRecap"
+>
+  <p class="text-center font-bold text-4xl">Team Kairos BDR Recap Generator</p>
   <input
     type="file"
     id="recapFile"
@@ -19,29 +23,124 @@
   class="text-center pt-8 min-h-screen mb-auto w-2/4 mx-auto"
   *ngIf="hasFormattedRecap"
 >
-  <h1>Recap formatting complete!</h1>
   <p-accordion [multiple]="true">
     <p-accordionTab
       *ngFor="let recap of formattedRecap"
       [header]="recap.salesRep"
     >
-      <div class="text-right">
+      <div class="relative">
         <button
           (click)="copyRecapToClipboard(recap.id, recap.salesRep)"
-          class="block bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-4 mt-10"
+          class="absolute -top-16 right-0 z-10 block bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-1"
         >
           Copy to clipboard
         </button>
       </div>
-      <div [id]="recap.id" class="text-left">
-        <span *ngFor="let activity of recap.allActivities">
-          <p class="font-bold inline">
-            {{ activity.accountName }} - {{ activity.prospectName }} -
-            {{ activity.prospectTitle }} - {{ activity.activitySubject }} -
-          </p>
-          {{ activity.activityComments }}<br />
-          &nbsp;<br />
-        </span>
+      <div [id]="recap.id" class="text-left p-8">
+        <p class="text-2xl font-bold underline mt-4 mb-2">
+          Meetings Booked - {{ recap.allActivities.meetings.length }}
+        </p>
+        <ul
+          *ngIf="recap.allActivities.meetings.length; else noMeetings"
+          class="list-disc"
+        >
+          <li *ngFor="let meeting of recap.allActivities.meetings">
+            <span class="font-bold text-gray-700">
+              {{ meeting.accountName }} - {{ meeting.prospectName }} -
+              {{ meeting.prospectTitle }} -
+            </span>
+            {{ meeting.activityComments }}
+          </li>
+        </ul>
+        <ng-template #noMeetings>
+          <span class="italic text-gray-400"
+            >No meetings booked this week.</span
+          >
+        </ng-template>
+
+        <p class="text-2xl font-bold underline mt-4 mb-2">
+          Conversations/Spokes - {{ recap.allActivities.spokes.length }}
+        </p>
+        <ul
+          *ngIf="recap.allActivities.spokes.length; else noSpokes"
+          class="list-disc"
+        >
+          <li *ngFor="let spoke of recap.allActivities.spokes">
+            <span class="font-bold text-gray-700"
+              >{{ spoke.accountName }} - {{ spoke.prospectName }} -
+              {{ spoke.prospectTitle }} -
+            </span>
+            {{ spoke.activityComments }}
+          </li>
+        </ul>
+        <ng-template #noSpokes>
+          <span class="italic text-gray-400">No spokes this week.</span>
+        </ng-template>
+
+        <p class="text-2xl font-bold underline mt-4 mb-2">
+          Email Responses - {{ recap.allActivities.emailResponses.length }}
+        </p>
+        <ul
+          *ngIf="
+            recap.allActivities.emailResponses.length;
+            else noEmailResponses
+          "
+          class="list-disc"
+        >
+          <li *ngFor="let email of recap.allActivities.emailResponses">
+            <span class="font-bold text-gray-700"
+              >{{ email.accountName }} - {{ email.prospectName }} -
+              {{ email.prospectTitle }} -
+            </span>
+            {{ email.activityComments }}
+          </li>
+        </ul>
+        <ng-template #noEmailResponses>
+          <span class="italic text-gray-400"
+            >No email responses this week.</span
+          >
+        </ng-template>
+
+        <p class="text-2xl font-bold underline mt-4 mb-2">
+          Event RSVPs - {{ recap.allActivities.rsvps.length }}
+        </p>
+        <ul
+          *ngIf="recap.allActivities.rsvps.length; else noRsvps"
+          class="list-disc"
+        >
+          <li *ngFor="let rsvp of recap.allActivities.rsvps">
+            <span class="font-bold text-gray-700"
+              >{{ rsvp.accountName }} - {{ rsvp.prospectName }} -
+              {{ rsvp.prospectTitle }} -
+            </span>
+            {{ rsvp.activityComments }}
+          </li>
+        </ul>
+        <ng-template #noRsvps>
+          <span class="italic text-gray-400">No event RSVPs this week.</span>
+        </ng-template>
+
+        <p class="text-2xl font-bold underline mt-4 mb-2">
+          Account profiling/Data hygiene -
+          {{ recap.allActivities.profiling.length }}
+        </p>
+        <ul
+          *ngIf="recap.allActivities.profiling.length; else noProfiling"
+          class="list-disc"
+        >
+          <li *ngFor="let profile of recap.allActivities.profiling">
+            <span class="font-bold text-gray-700"
+              >{{ profile.accountName }} - {{ profile.prospectName }} -
+              {{ profile.prospectTitle }} -
+            </span>
+            {{ profile.activityComments }}
+          </li>
+        </ul>
+        <ng-template #noProfiling>
+          <span class="italic text-gray-400"
+            >No profiling activities this week.</span
+          >
+        </ng-template>
       </div>
     </p-accordionTab>
   </p-accordion>

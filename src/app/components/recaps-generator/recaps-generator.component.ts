@@ -13,6 +13,7 @@ export class RecapsGeneratorComponent implements OnInit {
 
   ngOnInit(): void {
     document.title = this.title;
+    document.body.style.backgroundColor = '#F8F8F8';
   }
 
   title = 'BDR Recap Generator';
@@ -101,11 +102,30 @@ export class RecapsGeneratorComponent implements OnInit {
                 id: `recap-id-${rowIndex}`,
                 salesRep: row[this.columns.salesRepColum],
                 allActivities: {
-                  spokes: [],
-                  meetings: [],
-                  emailResponses: [],
-                  profiling: [],
-                  rsvps: [],
+                  meetings: row[this.columns.subjectColumn].includes('Meeting')
+                    ? [this.createActivityObject(row)]
+                    : [],
+                  spokes:
+                    row[this.columns.subjectColumn].includes(
+                      '[Spoke No Interest]'
+                    ) ||
+                    row[this.columns.subjectColumn].includes('Other') ||
+                    row[this.columns.subjectColumn].includes('Call Back')
+                      ? [this.createActivityObject(row)]
+                      : [],
+                  emailResponses: row[this.columns.subjectColumn].includes(
+                    '[In]'
+                  )
+                    ? [this.createActivityObject(row)]
+                    : [],
+                  profiling: row[this.columns.subjectColumn].includes(
+                    '[Profiling]'
+                  )
+                    ? [this.createActivityObject(row)]
+                    : [],
+                  rsvps: row[this.columns.subjectColumn].includes('RSVP')
+                    ? [this.createActivityObject(row)]
+                    : [],
                   other: [],
 
                   // {
@@ -119,37 +139,40 @@ export class RecapsGeneratorComponent implements OnInit {
                   // },
                 },
               });
-            }
-            if (row[this.columns.subjectColumn].includes('Meeting')) {
-              this.formattedRecap[repIndex].allActivities.meetings.push(
-                this.createActivityObject(row)
-              );
-            } else if (
-              row[this.columns.subjectColumn].includes('[Spoke No Interest]') ||
-              row[this.columns.subjectColumn].includes('Other') ||
-              row[this.columns.subjectColumn].includes('Call Back')
-            ) {
-              this.formattedRecap[repIndex].allActivities.spokes.push(
-                this.createActivityObject(row)
-              );
-            } else if (row[this.columns.subjectColumn].includes('[In]')) {
-              this.formattedRecap[repIndex].allActivities.emailResponses.push(
-                this.createActivityObject(row)
-              );
-            } else if (
-              row[this.columns.subjectColumn].includes('[Profiling]')
-            ) {
-              this.formattedRecap[repIndex].allActivities.profiling.push(
-                this.createActivityObject(row)
-              );
-            } else if (row[this.columns.subjectColumn].includes('RSVP')) {
-              this.formattedRecap[repIndex].allActivities.rsvps.push(
-                this.createActivityObject(row)
-              );
             } else {
-              this.formattedRecap[repIndex].allActivities.other.push(
-                this.createActivityObject(row)
-              );
+              if (row[this.columns.subjectColumn].includes('Meeting')) {
+                this.formattedRecap[repIndex].allActivities.meetings.push(
+                  this.createActivityObject(row)
+                );
+              } else if (
+                row[this.columns.subjectColumn].includes(
+                  '[Spoke No Interest]'
+                ) ||
+                row[this.columns.subjectColumn].includes('Other') ||
+                row[this.columns.subjectColumn].includes('Call Back')
+              ) {
+                this.formattedRecap[repIndex].allActivities.spokes.push(
+                  this.createActivityObject(row)
+                );
+              } else if (row[this.columns.subjectColumn].includes('[In]')) {
+                this.formattedRecap[repIndex].allActivities.emailResponses.push(
+                  this.createActivityObject(row)
+                );
+              } else if (
+                row[this.columns.subjectColumn].includes('[Profiling]')
+              ) {
+                this.formattedRecap[repIndex].allActivities.profiling.push(
+                  this.createActivityObject(row)
+                );
+              } else if (row[this.columns.subjectColumn].includes('RSVP')) {
+                this.formattedRecap[repIndex].allActivities.rsvps.push(
+                  this.createActivityObject(row)
+                );
+              } else {
+                this.formattedRecap[repIndex].allActivities.other.push(
+                  this.createActivityObject(row)
+                );
+              }
             }
           }
         });
