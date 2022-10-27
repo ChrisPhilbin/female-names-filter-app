@@ -49,34 +49,8 @@ export class RecapsGeneratorComponent implements OnInit {
       .then((rows) => {
         rows.forEach((row: string[], rowIndex = 0) => {
           if (rowIndex === 0) {
-            row.forEach((cell: string, cellIndex) => {
-              if (cell.toUpperCase() === 'COMPANY / ACCOUNT') {
-                this.columns.accountNameColumn = cellIndex;
-              }
-
-              if (cell.toUpperCase() === 'NAME') {
-                this.columns.prospectNameColumn = cellIndex;
-              }
-
-              if (cell.toUpperCase() === 'TITLE') {
-                this.columns.prospectTitleColum = cellIndex;
-              }
-
-              if (cell.toUpperCase() === 'COMMENTS') {
-                this.columns.commentsColumn = cellIndex;
-              }
-
-              if (cell.toUpperCase() === 'SUBJECT') {
-                this.columns.subjectColumn = cellIndex;
-              }
-
-              if (cell.toUpperCase() === 'ACTIVITY TYPE') {
-                this.columns.activityTypeColumn = cellIndex;
-              }
-
-              if (cell.toUpperCase() === 'ACCOUNT OWNER') {
-                this.columns.salesRepColum = cellIndex;
-              }
+            row.forEach((cell: string, cellIndex: number) => {
+              this.setupHeaders(cell, cellIndex);
             });
           } else {
             if (
@@ -127,16 +101,6 @@ export class RecapsGeneratorComponent implements OnInit {
                     ? [this.createActivityObject(row)]
                     : [],
                   other: [],
-
-                  // {
-                  //   accountName: row[accountNameColumn],
-                  //   prospectName: row[prospectNameColumn],
-                  //   prospectTitle: row[prospectTitleColum],
-                  //   activitySubject: row[subjectColumn],
-                  //   activityComments: row[commentsColumn],
-                  //   activityType: row[activityTypeColumn],
-                  //   salesRep: row[salesRepColum],
-                  // },
                 },
               });
             } else {
@@ -185,6 +149,36 @@ export class RecapsGeneratorComponent implements OnInit {
         console.log(error, 'Something went wrong.');
         this.throwError('Something unexpected happened. Please try again.');
       });
+  }
+
+  setupHeaders(cell: string, cellIndex: number): void {
+    if (cell.toUpperCase() === 'COMPANY / ACCOUNT') {
+      this.columns.accountNameColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'NAME') {
+      this.columns.prospectNameColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'TITLE') {
+      this.columns.prospectTitleColum = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'COMMENTS') {
+      this.columns.commentsColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'SUBJECT') {
+      this.columns.subjectColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'ACTIVITY TYPE') {
+      this.columns.activityTypeColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'ACCOUNT OWNER') {
+      this.columns.salesRepColum = cellIndex;
+    }
   }
 
   createActivityObject(activityRow) {
