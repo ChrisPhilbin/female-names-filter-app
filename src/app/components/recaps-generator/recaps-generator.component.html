@@ -92,7 +92,16 @@
               >{{ email.accountName }} - {{ email.prospectName }} -
               {{ email.prospectTitle }} -
             </span>
-            {{ email.activityComments }}
+            <span
+              [innerHTML]="
+                email.activityComments.length > 200
+                  ? formatEmailResponse(
+                      email.activityComments,
+                      email.activityId
+                    )
+                  : email.ActivityComments
+              "
+            ></span>
           </li>
         </ul>
         <ng-template #noEmailResponses>
@@ -145,4 +154,54 @@
     </p-accordionTab>
   </p-accordion>
 </div>
+<p-dialog
+  header="Hey, Fellow BDR!"
+  [(visible)]="displayModal"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+  [baseZIndex]="10000"
+  [draggable]="true"
+  [resizable]="false"
+>
+  <p class="p-m-0">
+    This app will help you take an export from Salesforce and auto-generate a
+    pre-formatted recap for you based on the activities that you have logged.<br />
+    <br />
+    <mark
+      ><strong
+        >AFTER EXPORTING FROM SALESFORCE BE SURE TO FIRST OPEN THE FILE IN EXCEL
+        AND SIMPLY RE-SAVE IT</strong
+      ><br />
+      <strong
+        >Skipping this step will cause errors and the app will likely not work
+        properly for you.</strong
+      ><br
+    /></mark>
+    <br />
+    <strong>A couple of things to note:</strong><br />
+    <li>
+      Remember: If it's not in Salesforce it will not appear on the
+      auto-generated recap.
+    </li>
+    <li>
+      Email responses will be limited to 200 characters. A "read more" link will
+      link back to the actual activity record in Salesforce.
+    </li>
+    <br />
+    <strong>Run into issues?</strong><br />
+    Contact Ukrewer Chris Philbin
+  </p>
+  <ng-template pTemplate="footer">
+    <button
+      class="bg-teal-600 hover:bg-teal-500 text-white font-bold rounded p-4 mb-4"
+      (click)="displayModal = false"
+    >
+      Okay, got it!
+    </button>
+    <p class="mt-2 text-xs text-gray-400">
+      Note: files you provide for conversion are never transmitted to a 3rd
+      party server. All conversions are done locally in your browser.
+    </p>
+  </ng-template>
+</p-dialog>
 <p-toast></p-toast>

@@ -15,6 +15,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { TooltipModule } from 'primeng/tooltip';
 import { RecapsGeneratorComponent } from './components/recaps-generator/recaps-generator.component';
 import { ProspectNamesFilterComponent } from './components/prospect-names-filter/prospect-names-filter.component';
+import { HomeComponent } from './components/home/home.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { ProspectNamesFilterComponent } from './components/prospect-names-filter
     FooterComponent,
     RecapsGeneratorComponent,
     ProspectNamesFilterComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,

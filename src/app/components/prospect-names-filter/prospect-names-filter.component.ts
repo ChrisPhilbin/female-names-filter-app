@@ -24,6 +24,7 @@ export class ProspectNamesFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.displayModal = true;
+    document.title = 'Prospect Names Filter';
   }
 
   throwError(message: string) {

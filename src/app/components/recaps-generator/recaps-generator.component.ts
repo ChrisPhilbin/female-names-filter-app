@@ -14,8 +14,10 @@ export class RecapsGeneratorComponent implements OnInit {
   ngOnInit(): void {
     document.title = this.title;
     document.body.style.backgroundColor = '#F8F8F8';
+    this.displayModal = true;
   }
 
+  displayModal: boolean = false;
   title = 'BDR Recap Generator';
   canClick: boolean = false;
   hasErrors: boolean = false;
@@ -31,6 +33,7 @@ export class RecapsGeneratorComponent implements OnInit {
     subjectColumn: null,
     activityTypeColumn: null,
     salesRepColum: null,
+    activityIdColumn: null,
   };
 
   generateRecap() {
@@ -60,7 +63,8 @@ export class RecapsGeneratorComponent implements OnInit {
               !this.columns.subjectColumn ||
               !this.columns.activityTypeColumn ||
               !this.columns.commentsColumn ||
-              !this.columns.salesRepColum
+              !this.columns.salesRepColum ||
+              !this.columns.activityIdColumn
             ) {
               this.throwError(
                 'The provided file does not have the proper table headers.'
@@ -179,6 +183,10 @@ export class RecapsGeneratorComponent implements OnInit {
     if (cell.toUpperCase() === 'ACCOUNT OWNER') {
       this.columns.salesRepColum = cellIndex;
     }
+
+    if (cell.toUpperCase() === 'ACTIVITY ID') {
+      this.columns.activityIdColumn = cellIndex;
+    }
   }
 
   createActivityObject(activityRow) {
@@ -189,6 +197,7 @@ export class RecapsGeneratorComponent implements OnInit {
       activitySubject: activityRow[this.columns.subjectColumn],
       activityComments: activityRow[this.columns.commentsColumn],
       activityType: activityRow[this.columns.activityTypeColumn],
+      activityId: activityRow[this.columns.activityIdColumn],
       salesRep: activityRow[this.columns.salesRepColum],
     };
   }
@@ -210,6 +219,13 @@ export class RecapsGeneratorComponent implements OnInit {
       summary: 'Success!',
       detail: `Copied recap for ${repName} to the clipboard!`,
     });
+  }
+
+  formatEmailResponse(emailBody: string, activityId: string): string {
+    emailBody = emailBody.slice(0, 200) + ``;
+    return (
+      emailBody + `.... <a href="${activityId}"><b>Link to full email</b></a>`
+    );
   }
 
   throwError(message: string) {
