@@ -34,6 +34,7 @@ export class RecapsGeneratorComponent implements OnInit {
     subjectColumn: null,
     activityTypeColumn: null,
     salesRepColum: null,
+    coOwnerColumn: null,
     activityIdColumn: null,
     accountIdColumn: null,
     contactIdColumn: null,
@@ -68,6 +69,7 @@ export class RecapsGeneratorComponent implements OnInit {
               !this.columns.activityTypeColumn ||
               !this.columns.commentsColumn ||
               !this.columns.salesRepColum ||
+              !this.columns.coOwnerColumn ||
               !this.columns.accountIdColumn ||
               !this.columns.contactIdColumn ||
               !this.columns.activityIdColumn
@@ -86,15 +88,14 @@ export class RecapsGeneratorComponent implements OnInit {
                 id: `recap-id-${rowIndex}`,
                 salesRep: row[this.columns.salesRepColum],
                 allActivities: {
-                  meetings: row[this.columns.activityTypeColumn].includes(
-                    'Meeting'
-                  )
-                    ? [this.createActivityObject(row)]
-                    : [],
+                  meetings:
+                    row[this.columns.activityTypeColumn].includes('Meeting') ||
+                    row[this.columns.subjectColumn].includes('Meeting')
+                      ? [this.createActivityObject(row)]
+                      : [],
                   spokes:
-                    row[this.columns.subjectColumn].includes('Spoke') ||
-                    row[this.columns.subjectColumn].includes('Other') ||
-                    row[this.columns.subjectColumn].includes('Call Back')
+                    row[this.columns.subjectColumn].includes('Spoke') &&
+                    row[this.columns.activityTypeColumn].includes('Call')
                       ? [this.createActivityObject(row)]
                       : [],
                   emailResponses: row[this.columns.subjectColumn].includes(
@@ -114,17 +115,14 @@ export class RecapsGeneratorComponent implements OnInit {
                 },
               });
             } else {
-              if (row[this.columns.subjectColumn].includes('Meeting')) {
+              if (
+                row[this.columns.subjectColumn].includes('Meeting') ||
+                row[this.columns.activityTypeColumn].includes('Meeting')
+              ) {
                 this.formattedRecap[repIndex].allActivities.meetings.push(
                   this.createActivityObject(row)
                 );
-              } else if (
-                row[this.columns.subjectColumn].includes(
-                  '[Spoke No Interest]'
-                ) ||
-                row[this.columns.subjectColumn].includes('Other') ||
-                row[this.columns.subjectColumn].includes('Call Back')
-              ) {
+              } else if (row[this.columns.subjectColumn].includes('Spoke')) {
                 this.formattedRecap[repIndex].allActivities.spokes.push(
                   this.createActivityObject(row)
                 );
@@ -192,6 +190,10 @@ export class RecapsGeneratorComponent implements OnInit {
 
     if (cell.toUpperCase() === 'ACCOUNT OWNER') {
       this.columns.salesRepColum = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'CO-OWNER') {
+      this.columns.coOwnerColumn = cellIndex;
     }
 
     if (cell.toUpperCase() === 'ACTIVITY ID') {
