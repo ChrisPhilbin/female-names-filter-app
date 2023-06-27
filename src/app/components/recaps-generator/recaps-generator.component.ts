@@ -27,13 +27,16 @@ export class RecapsGeneratorComponent implements OnInit {
   formattedRecap = [];
   columns = {
     accountNameColumn: null,
-    prospectNameColumn: null,
+    prospectFirstNameColumn: null,
+    prospectLastNameColumn: null,
     prospectTitleColum: null,
     commentsColumn: null,
     subjectColumn: null,
     activityTypeColumn: null,
     salesRepColum: null,
     activityIdColumn: null,
+    accountIdColumn: null,
+    contactIdColumn: null,
   };
 
   generateRecap() {
@@ -58,12 +61,15 @@ export class RecapsGeneratorComponent implements OnInit {
           } else {
             if (
               !this.columns.accountNameColumn ||
-              !this.columns.prospectNameColumn ||
+              !this.columns.prospectFirstNameColumn ||
+              !this.columns.prospectLastNameColumn ||
               !this.columns.prospectTitleColum ||
               !this.columns.subjectColumn ||
               !this.columns.activityTypeColumn ||
               !this.columns.commentsColumn ||
               !this.columns.salesRepColum ||
+              !this.columns.accountIdColumn ||
+              !this.columns.contactIdColumn ||
               !this.columns.activityIdColumn
             ) {
               this.throwError(
@@ -80,13 +86,13 @@ export class RecapsGeneratorComponent implements OnInit {
                 id: `recap-id-${rowIndex}`,
                 salesRep: row[this.columns.salesRepColum],
                 allActivities: {
-                  meetings: row[this.columns.subjectColumn].includes('Meeting')
+                  meetings: row[this.columns.activityTypeColumn].includes(
+                    'Meeting'
+                  )
                     ? [this.createActivityObject(row)]
                     : [],
                   spokes:
-                    row[this.columns.subjectColumn].includes(
-                      '[Spoke No Interest]'
-                    ) ||
+                    row[this.columns.subjectColumn].includes('Spoke') ||
                     row[this.columns.subjectColumn].includes('Other') ||
                     row[this.columns.subjectColumn].includes('Call Back')
                       ? [this.createActivityObject(row)]
@@ -156,19 +162,23 @@ export class RecapsGeneratorComponent implements OnInit {
   }
 
   setupHeaders(cell: string, cellIndex: number): void {
-    if (cell.toUpperCase() === 'COMPANY / ACCOUNT') {
+    if (cell.toUpperCase() === 'ACCOUNT NAME') {
       this.columns.accountNameColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'NAME') {
-      this.columns.prospectNameColumn = cellIndex;
+    if (cell.toUpperCase() === 'FIRST NAME') {
+      this.columns.prospectFirstNameColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'TITLE') {
+    if (cell.toUpperCase() === 'LAST NAME') {
+      this.columns.prospectLastNameColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'JOB TITLE') {
       this.columns.prospectTitleColum = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'COMMENTS') {
+    if (cell.toUpperCase() === 'FULL COMMENTS') {
       this.columns.commentsColumn = cellIndex;
     }
 
@@ -176,7 +186,7 @@ export class RecapsGeneratorComponent implements OnInit {
       this.columns.subjectColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'ACTIVITY TYPE') {
+    if (cell.toUpperCase() === 'UKG ACTIVITY TYPE') {
       this.columns.activityTypeColumn = cellIndex;
     }
 
@@ -187,17 +197,30 @@ export class RecapsGeneratorComponent implements OnInit {
     if (cell.toUpperCase() === 'ACTIVITY ID') {
       this.columns.activityIdColumn = cellIndex;
     }
+
+    if (cell.toUpperCase() === 'ACCOUNT ID') {
+      this.columns.accountIdColumn = cellIndex;
+    }
+
+    if (cell.toUpperCase() === 'CONTACT ID') {
+      this.columns.contactIdColumn = cellIndex;
+    }
   }
 
   createActivityObject(activityRow) {
     return {
       accountName: activityRow[this.columns.accountNameColumn],
-      prospectName: activityRow[this.columns.prospectNameColumn],
+      prospectName:
+        activityRow[this.columns.prospectFirstNameColumn] +
+        ' ' +
+        activityRow[this.columns.prospectLastNameColumn],
       prospectTitle: activityRow[this.columns.prospectTitleColum],
       activitySubject: activityRow[this.columns.subjectColumn],
       activityComments: activityRow[this.columns.commentsColumn],
       activityType: activityRow[this.columns.activityTypeColumn],
       activityId: activityRow[this.columns.activityIdColumn],
+      accountId: activityRow[this.columns.accountIdColumn],
+      contactId: activityRow[this.columns.contactIdColumn],
       salesRep: activityRow[this.columns.salesRepColum],
     };
   }

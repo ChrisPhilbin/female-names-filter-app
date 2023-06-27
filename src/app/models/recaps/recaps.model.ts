@@ -20,12 +20,15 @@ export interface IRecap {
 }
 
 interface IActivity {
-  activityId?: number;
+  activityId: number;
+  accountId: string;
+  contactId: string;
   accountName: string;
   prospectName: string;
   prospectTitle: string;
   activitySubject: string;
   activityType: string;
+  activityNotes: string;
   salesRepName: string;
 }
 
