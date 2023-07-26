@@ -24,6 +24,7 @@ export class RecapsGeneratorComponent implements OnInit {
   isConverting: boolean = false;
   tableHeader: string[][] = [];
   hasFormattedRecap: boolean = false;
+  hasUnassignedActivity: boolean = false;
   formattedRecap = [];
   columns = {
     accountNameColumn: null,
@@ -33,7 +34,7 @@ export class RecapsGeneratorComponent implements OnInit {
     commentsColumn: null,
     subjectColumn: null,
     activityTypeColumn: null,
-    salesRepColum: null,
+    salesRepColumn: null,
     coOwnerColumn: null,
     activityIdColumn: null,
     accountIdColumn: null,
@@ -68,7 +69,7 @@ export class RecapsGeneratorComponent implements OnInit {
               !this.columns.subjectColumn ||
               !this.columns.activityTypeColumn ||
               !this.columns.commentsColumn ||
-              !this.columns.salesRepColum ||
+              !this.columns.salesRepColumn ||
               !this.columns.coOwnerColumn ||
               !this.columns.accountIdColumn ||
               !this.columns.contactIdColumn ||
@@ -81,12 +82,20 @@ export class RecapsGeneratorComponent implements OnInit {
             }
 
             let repIndex = this.formattedRecap.findIndex((recap) => {
-              return recap.salesRep === row[this.columns.salesRepColum];
+              //this.columns.salesRepColumn - need to determine when to reference salesRepColumn vs coOwner column
+              if (!row[this.columns.coOwnerColumn]) {
+                return recap.salesRep === row[this.columns.salesRepColumn];
+              } else {
+                return recap.salesRep === row[this.columns.coOwnerColumn];
+              }
             });
             if (repIndex === -1) {
               this.formattedRecap.push({
                 id: `recap-id-${rowIndex}`,
-                salesRep: row[this.columns.salesRepColum],
+                salesRep:
+                  row[this.columns.coOwnerColumn] !== null
+                    ? row[this.columns.coOwnerColumn]
+                    : row[this.columns.salesRepColumn],
                 allActivities: {
                   meetings:
                     row[this.columns.activityTypeColumn].includes('Meeting') ||
@@ -150,7 +159,13 @@ export class RecapsGeneratorComponent implements OnInit {
         });
       })
       .then(() => {
-        console.log(this.formattedRecap, 'formatted recap.');
+        const unassignedActivity = this.formattedRecap.findIndex((recap) => {
+          return recap.salesRep === 'New Logo Accounts';
+        });
+        if (unassignedActivity !== -1) {
+          this.hasUnassignedActivity = true;
+          this.showSuccess();
+        }
         this.hasFormattedRecap = true;
       })
       .catch((error) => {
@@ -189,7 +204,7 @@ export class RecapsGeneratorComponent implements OnInit {
     }
 
     if (cell.toUpperCase() === 'ACCOUNT OWNER') {
-      this.columns.salesRepColum = cellIndex;
+      this.columns.salesRepColumn = cellIndex;
     }
 
     if (cell.toUpperCase() === 'CO-OWNER') {
@@ -223,7 +238,7 @@ export class RecapsGeneratorComponent implements OnInit {
       activityId: activityRow[this.columns.activityIdColumn],
       accountId: activityRow[this.columns.accountIdColumn],
       contactId: activityRow[this.columns.contactIdColumn],
-      salesRep: activityRow[this.columns.salesRepColum],
+      salesRep: activityRow[this.columns.salesRepColumn],
     };
   }
 
@@ -251,6 +266,16 @@ export class RecapsGeneratorComponent implements OnInit {
     return (
       emailBody + `.... <a href="${activityId}"><b>Link to full email</b></a>`
     );
+  }
+
+  showSuccess() {
+    this.isConverting = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Successfully generated recap!',
+      detail:
+        'It looks like you have some activities that need to be manually assigned!',
+    });
   }
 
   throwError(message: string) {
