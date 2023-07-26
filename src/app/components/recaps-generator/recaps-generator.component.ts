@@ -135,12 +135,22 @@ export class RecapsGeneratorComponent implements OnInit {
                 this.formattedRecap[repIndex].allActivities.spokes.push(
                   this.createActivityObject(row)
                 );
+              } else if (
+                row[this.columns.subjectColumn]
+                  .toLowerCase()
+                  .includes('email response')
+              ) {
+                this.formattedRecap[repIndex].allActivities.emailResponses.push(
+                  this.createActivityObject(row)
+                );
               } else if (row[this.columns.subjectColumn].includes('[In]')) {
                 this.formattedRecap[repIndex].allActivities.emailResponses.push(
                   this.createActivityObject(row)
                 );
               } else if (
-                row[this.columns.subjectColumn].includes('[Profiling]')
+                row[this.columns.subjectColumn]
+                  .toLowerCase()
+                  .includes('profiling')
               ) {
                 this.formattedRecap[repIndex].allActivities.profiling.push(
                   this.createActivityObject(row)
@@ -264,7 +274,8 @@ export class RecapsGeneratorComponent implements OnInit {
   formatEmailResponse(emailBody: string, activityId: string): string {
     emailBody = emailBody.slice(0, 200) + ``;
     return (
-      emailBody + `.... <a href="${activityId}"><b>Link to full email</b></a>`
+      emailBody +
+      `.... <a href="https://ukgsf.lightning.force.com/lightning/r/Lead/${activityId}/view"><b>Link to full email</b></a>`
     );
   }
 
