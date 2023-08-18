@@ -111,9 +111,12 @@ export class RecapsGeneratorComponent implements OnInit {
                     row[this.columns.subjectColumn]
                       .toLowerCase()
                       .includes('spoke') &&
-                    row[this.columns.activityTypeColumn]
+                    (row[this.columns.activityTypeColumn]
                       .toLowerCase()
-                      .includes('call')
+                      .includes('call') ||
+                      row[this.columns.activityTypeColumn]
+                        .toLowerCase()
+                        .includes('spoke'))
                       ? [this.createActivityObject(row)]
                       : [],
                   emailResponses: row[this.columns.subjectColumn]
