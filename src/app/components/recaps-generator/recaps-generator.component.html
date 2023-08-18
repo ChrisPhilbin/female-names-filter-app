@@ -46,8 +46,22 @@
         >
           <li *ngFor="let meeting of recap.allActivities.meetings">
             <span class="font-bold text-gray-700">
-              {{ meeting.accountName }} - {{ meeting.prospectName }} -
-              {{ meeting.prospectTitle }} -
+              <a
+                href="{{
+                  sfdcBaseUrl + '/Account/' + meeting.accountId + '/view'
+                }}"
+                target="_blank"
+                >{{ meeting.accountName }}</a
+              >
+              -
+              <a
+                href="{{
+                  sfdcBaseUrl + '/Contact/' + meeting.contactId + '/view'
+                }}"
+                target="_blank"
+                >{{ meeting.prospectName }} - {{ meeting.prospectTitle }}</a
+              >
+              -
             </span>
             {{ meeting.activityComments }}
           </li>
@@ -67,8 +81,22 @@
         >
           <li *ngFor="let spoke of recap.allActivities.spokes">
             <span class="font-bold text-gray-700"
-              >{{ spoke.accountName }} - {{ spoke.prospectName }} -
-              {{ spoke.prospectTitle }} -
+              ><a
+                href="{{
+                  sfdcBaseUrl + '/Account/' + spoke.accountId + '/view'
+                }}"
+                target="_blank"
+                >{{ spoke.accountName }}</a
+              >
+              -
+              <a
+                href="{{
+                  sfdcBaseUrl + '/Contact/' + spoke.contactId + '/view'
+                }}"
+                target="_blank"
+                >{{ spoke.prospectName }} - {{ spoke.prospectTitle }}</a
+              >
+              -
             </span>
             {{ spoke.activityComments }}
           </li>
@@ -78,7 +106,8 @@
         </ng-template>
 
         <p class="text-2xl font-bold underline mt-4 mb-2">
-          Email Responses - {{ recap.allActivities.emailResponses.length }}
+          Email Responses/LinkedIn Responses -
+          {{ recap.allActivities.emailResponses.length }}
         </p>
         <ul
           *ngIf="
@@ -89,8 +118,22 @@
         >
           <li *ngFor="let email of recap.allActivities.emailResponses">
             <span class="font-bold text-gray-700"
-              >{{ email.accountName }} - {{ email.prospectName }} -
-              {{ email.prospectTitle }} -
+              ><a
+                href="{{
+                  sfdcBaseUrl + '/Account/' + email.accountId + '/view'
+                }}"
+                target="_blank"
+                >{{ email.accountName }}</a
+              >
+              -
+              <a
+                href="{{
+                  sfdcBaseUrl + '/Contact/' + email.contactId + '/view'
+                }}"
+                target="_blank"
+                >{{ email.prospectName }} - {{ email.prospectTitle }}</a
+              >
+              -
             </span>
             <span
               [innerHTML]="
@@ -119,10 +162,28 @@
         >
           <li *ngFor="let rsvp of recap.allActivities.rsvps">
             <span class="font-bold text-gray-700"
-              >{{ rsvp.accountName }} - {{ rsvp.prospectName }} -
-              {{ rsvp.prospectTitle }} -
+              ><a
+                href="{{
+                  sfdcBaseUrl + '/Account/' + rsvp.accountId + '/view'
+                }}"
+                target="_blank"
+                >{{ rsvp.accountName }}</a
+              >
+              -
+              <a
+                href="{{
+                  sfdcBaseUrl + '/Contact/' + rsvp.contactId + '/view'
+                }}"
+                target="_blank"
+                >{{ rsvp.prospectName }} - {{ rsvp.prospectTitle }}</a
+              >
+              -
             </span>
-            {{ rsvp.activityComments }}
+            {{
+              rsvp.activityComments
+                ? rsvp.activityComments
+                : "No comments provided."
+            }}
           </li>
         </ul>
         <ng-template #noRsvps>
@@ -139,8 +200,22 @@
         >
           <li *ngFor="let profile of recap.allActivities.profiling">
             <span class="font-bold text-gray-700"
-              >{{ profile.accountName }} - {{ profile.prospectName }} -
-              {{ profile.prospectTitle }} -
+              ><a
+                href="{{
+                  sfdcBaseUrl + '/Account/' + profile.accountId + '/view'
+                }}"
+                target="_blank"
+                >{{ profile.accountName }}</a
+              >
+              -
+              <a
+                href="{{
+                  sfdcBaseUrl + '/Contact/' + profile.contactId + '/view'
+                }}"
+                target="_blank"
+                >{{ profile.prospectName }} - {{ profile.prospectTitle }}</a
+              >
+              -
             </span>
             {{ profile.activityComments }}
           </li>

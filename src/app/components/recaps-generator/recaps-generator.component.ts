@@ -17,6 +17,7 @@ export class RecapsGeneratorComponent implements OnInit {
     this.displayModal = true;
   }
 
+  sfdcBaseUrl = 'https://ukgsf.lightning.force.com/lightning/r';
   displayModal: boolean = false;
   title = 'BDR Recap Generator';
   canClick: boolean = false;
@@ -98,26 +99,36 @@ export class RecapsGeneratorComponent implements OnInit {
                     : row[this.columns.salesRepColumn],
                 allActivities: {
                   meetings:
-                    row[this.columns.activityTypeColumn].includes('Meeting') ||
-                    row[this.columns.subjectColumn].includes('Meeting')
+                    row[this.columns.activityTypeColumn]
+                      .toLowerCase()
+                      .includes('meeting') ||
+                    row[this.columns.subjectColumn]
+                      .toLowerCase()
+                      .includes('meeting')
                       ? [this.createActivityObject(row)]
                       : [],
                   spokes:
-                    row[this.columns.subjectColumn].includes('Spoke') &&
-                    row[this.columns.activityTypeColumn].includes('Call')
+                    row[this.columns.subjectColumn]
+                      .toLowerCase()
+                      .includes('spoke') &&
+                    row[this.columns.activityTypeColumn]
+                      .toLowerCase()
+                      .includes('call')
                       ? [this.createActivityObject(row)]
                       : [],
-                  emailResponses: row[this.columns.subjectColumn].includes(
-                    '[In]'
-                  )
+                  emailResponses: row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('email')
                     ? [this.createActivityObject(row)]
                     : [],
-                  profiling: row[this.columns.subjectColumn].includes(
-                    '[Profiling]'
-                  )
+                  profiling: row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('profiling')
                     ? [this.createActivityObject(row)]
                     : [],
-                  rsvps: row[this.columns.subjectColumn].includes('RSVP')
+                  rsvps: row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('rsvp')
                     ? [this.createActivityObject(row)]
                     : [],
                   other: [],
@@ -125,25 +136,30 @@ export class RecapsGeneratorComponent implements OnInit {
               });
             } else {
               if (
-                row[this.columns.subjectColumn].includes('Meeting') ||
-                row[this.columns.activityTypeColumn].includes('Meeting')
+                row[this.columns.subjectColumn]
+                  .toLowerCase()
+                  .includes('meeting') ||
+                row[this.columns.activityTypeColumn]
+                  .toLowerCase()
+                  .includes('meeting')
               ) {
                 this.formattedRecap[repIndex].allActivities.meetings.push(
                   this.createActivityObject(row)
                 );
-              } else if (row[this.columns.subjectColumn].includes('Spoke')) {
+              } else if (
+                row[this.columns.subjectColumn].toLowerCase().includes('spoke')
+              ) {
                 this.formattedRecap[repIndex].allActivities.spokes.push(
                   this.createActivityObject(row)
                 );
               } else if (
                 row[this.columns.subjectColumn]
                   .toLowerCase()
-                  .includes('email response')
+                  .includes('email') ||
+                row[this.columns.subjectColumn]
+                  .toLowerCase()
+                  .includes('linkedin')
               ) {
-                this.formattedRecap[repIndex].allActivities.emailResponses.push(
-                  this.createActivityObject(row)
-                );
-              } else if (row[this.columns.subjectColumn].includes('[In]')) {
                 this.formattedRecap[repIndex].allActivities.emailResponses.push(
                   this.createActivityObject(row)
                 );
@@ -155,7 +171,9 @@ export class RecapsGeneratorComponent implements OnInit {
                 this.formattedRecap[repIndex].allActivities.profiling.push(
                   this.createActivityObject(row)
                 );
-              } else if (row[this.columns.subjectColumn].includes('RSVP')) {
+              } else if (
+                row[this.columns.subjectColumn].toLowerCase().includes('rsvp')
+              ) {
                 this.formattedRecap[repIndex].allActivities.rsvps.push(
                   this.createActivityObject(row)
                 );
@@ -275,7 +293,7 @@ export class RecapsGeneratorComponent implements OnInit {
     emailBody = emailBody.slice(0, 200) + ``;
     return (
       emailBody +
-      `.... <a href="https://ukgsf.lightning.force.com/lightning/r/Lead/${activityId}/view"><b>Link to full email</b></a>`
+      `.... <a href="${this.sfdcBaseUrl}/Lead/${activityId}/view"><b>Link to full email</b></a>`
     );
   }
 
