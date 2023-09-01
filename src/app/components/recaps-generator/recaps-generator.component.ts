@@ -110,13 +110,16 @@ export class RecapsGeneratorComponent implements OnInit {
                   spokes:
                     row[this.columns.subjectColumn]
                       .toLowerCase()
-                      .includes('spoke') &&
-                    (row[this.columns.activityTypeColumn]
+                      .includes('spoke') ||
+                    (row[this.columns.subjectColumn]
                       .toLowerCase()
-                      .includes('call') ||
-                      row[this.columns.activityTypeColumn]
+                      .includes('call') &&
+                      (row[this.columns.activityTypeColumn]
                         .toLowerCase()
-                        .includes('spoke'))
+                        .includes('call') ||
+                        row[this.columns.activityTypeColumn]
+                          .toLowerCase()
+                          .includes('spoke')))
                       ? [this.createActivityObject(row)]
                       : [],
                   emailResponses: row[this.columns.subjectColumn]
@@ -150,7 +153,20 @@ export class RecapsGeneratorComponent implements OnInit {
                   this.createActivityObject(row)
                 );
               } else if (
-                row[this.columns.subjectColumn].toLowerCase().includes('spoke')
+                //update
+                row[this.columns.subjectColumn]
+                  .toLowerCase()
+                  .includes('spoke') ||
+                (row[this.columns.subjectColumn]
+                  .toLowerCase()
+                  .includes('call') &&
+                  (row[this.columns.activityTypeColumn]
+                    .toLowerCase()
+                    .includes('call') ||
+                    row[this.columns.activityTypeColumn]
+                      .toLowerCase()
+                      .includes('spoke')))
+                // row[this.columns.subjectColumn].toLowerCase().includes('spoke')
               ) {
                 this.formattedRecap[repIndex].allActivities.spokes.push(
                   this.createActivityObject(row)
@@ -206,51 +222,52 @@ export class RecapsGeneratorComponent implements OnInit {
   }
 
   setupHeaders(cell: string, cellIndex: number): void {
-    if (cell.toUpperCase() === 'ACCOUNT NAME') {
+    cell = cell.toUpperCase();
+    if (cell === 'ACCOUNT NAME' || cell === 'ASSOCIATED COMPANY') {
       this.columns.accountNameColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'FIRST NAME') {
+    if (cell === 'FIRST NAME') {
       this.columns.prospectFirstNameColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'LAST NAME') {
+    if (cell === 'LAST NAME') {
       this.columns.prospectLastNameColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'JOB TITLE') {
+    if (cell === 'JOB TITLE') {
       this.columns.prospectTitleColum = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'FULL COMMENTS') {
+    if (cell === 'FULL COMMENTS') {
       this.columns.commentsColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'SUBJECT') {
+    if (cell === 'SUBJECT') {
       this.columns.subjectColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'UKG ACTIVITY TYPE') {
+    if (cell === 'UKG ACTIVITY TYPE') {
       this.columns.activityTypeColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'ACCOUNT OWNER') {
+    if (cell === 'ACCOUNT OWNER' || cell === 'SALES REP') {
       this.columns.salesRepColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'CO-OWNER') {
+    if (cell === 'CO-OWNER' || cell === 'DEFAULT ACCOUNT OWNER') {
       this.columns.coOwnerColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'ACTIVITY ID') {
+    if (cell === 'ACTIVITY ID') {
       this.columns.activityIdColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'ACCOUNT ID') {
+    if (cell === 'ACCOUNT ID' || cell === 'ASSOCIATED ACCOUNT ID') {
       this.columns.accountIdColumn = cellIndex;
     }
 
-    if (cell.toUpperCase() === 'CONTACT ID') {
+    if (cell === 'CONTACT ID' || cell === 'LEAD ID') {
       this.columns.contactIdColumn = cellIndex;
     }
   }

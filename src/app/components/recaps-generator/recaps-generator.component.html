@@ -2,7 +2,7 @@
   class="text-center pt-8 min-h-screen mb-auto pt-44"
   *ngIf="!hasFormattedRecap"
 >
-  <p class="text-center font-bold text-4xl">Team Kairos BDR Recap Generator</p>
+  <p class="text-center font-bold text-4xl">BDR Nation Recap Generator</p>
   <input
     type="file"
     id="recapFile"
@@ -26,7 +26,7 @@
   <p-accordion [multiple]="true">
     <p-accordionTab
       *ngFor="let recap of formattedRecap"
-      [header]="recap.salesRep"
+      [header]="recap.salesRep ? recap.salesRep : 'Unassigned'"
     >
       <div class="relative">
         <button
@@ -73,7 +73,7 @@
         </ng-template>
 
         <p class="text-2xl font-bold underline mt-4 mb-2">
-          Conversations/Spokes - {{ recap.allActivities.spokes.length }}
+          Calls/Conversations/Spokes - {{ recap.allActivities.spokes.length }}
         </p>
         <ul
           *ngIf="recap.allActivities.spokes.length; else noSpokes"
