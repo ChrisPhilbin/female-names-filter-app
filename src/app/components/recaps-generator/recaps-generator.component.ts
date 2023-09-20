@@ -53,172 +53,175 @@ export class RecapsGeneratorComponent implements OnInit {
         'No recap file provided. Please make sure you select a valid recap file!'
       );
     }
-
-    readXlsxFile(input.files[0])
-      .then((rows) => {
-        rows.forEach((row: string[], rowIndex = 0) => {
-          if (rowIndex === 0) {
-            row.forEach((cell: string, cellIndex: number) => {
-              this.setupHeaders(cell, cellIndex);
-            });
-          } else {
-            if (
-              !this.columns.accountNameColumn ||
-              !this.columns.prospectFirstNameColumn ||
-              !this.columns.prospectLastNameColumn ||
-              !this.columns.prospectTitleColum ||
-              !this.columns.subjectColumn ||
-              !this.columns.activityTypeColumn ||
-              !this.columns.commentsColumn ||
-              !this.columns.salesRepColumn ||
-              !this.columns.coOwnerColumn ||
-              !this.columns.accountIdColumn ||
-              !this.columns.contactIdColumn ||
-              !this.columns.activityIdColumn
-            ) {
-              this.throwError(
-                'The provided file does not have the proper table headers.'
-              );
-              return;
-            }
-
-            let repIndex = this.formattedRecap.findIndex((recap) => {
-              //this.columns.salesRepColumn - need to determine when to reference salesRepColumn vs coOwner column
-              if (!row[this.columns.coOwnerColumn]) {
-                return recap.salesRep === row[this.columns.salesRepColumn];
-              } else {
-                return recap.salesRep === row[this.columns.coOwnerColumn];
-              }
-            });
-            if (repIndex === -1) {
-              this.formattedRecap.push({
-                id: `recap-id-${rowIndex}`,
-                salesRep:
-                  row[this.columns.coOwnerColumn] !== null
-                    ? row[this.columns.coOwnerColumn]
-                    : row[this.columns.salesRepColumn],
-                allActivities: {
-                  meetings:
-                    row[this.columns.activityTypeColumn]
-                      .toLowerCase()
-                      .includes('meeting') ||
-                    row[this.columns.subjectColumn]
-                      .toLowerCase()
-                      .includes('meeting')
-                      ? [this.createActivityObject(row)]
-                      : [],
-                  spokes:
-                    row[this.columns.subjectColumn]
-                      .toLowerCase()
-                      .includes('spoke') ||
-                    (row[this.columns.subjectColumn]
-                      .toLowerCase()
-                      .includes('call') &&
-                      (row[this.columns.activityTypeColumn]
-                        .toLowerCase()
-                        .includes('call') ||
-                        row[this.columns.activityTypeColumn]
-                          .toLowerCase()
-                          .includes('spoke')))
-                      ? [this.createActivityObject(row)]
-                      : [],
-                  emailResponses: row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('email')
-                    ? [this.createActivityObject(row)]
-                    : [],
-                  profiling: row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('profiling')
-                    ? [this.createActivityObject(row)]
-                    : [],
-                  rsvps: row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('rsvp')
-                    ? [this.createActivityObject(row)]
-                    : [],
-                  other: [],
-                },
+    for (let fileCount = 0; fileCount < input.files.length; fileCount++) {
+      readXlsxFile(input.files[fileCount])
+        .then((rows) => {
+          rows.forEach((row: string[], rowIndex = 0) => {
+            if (rowIndex === 0) {
+              row.forEach((cell: string, cellIndex: number) => {
+                this.setupHeaders(cell, cellIndex);
               });
             } else {
               if (
-                row[this.columns.subjectColumn]
-                  .toLowerCase()
-                  .includes('meeting') ||
-                row[this.columns.activityTypeColumn]
-                  .toLowerCase()
-                  .includes('meeting')
+                !this.columns.accountNameColumn ||
+                !this.columns.prospectFirstNameColumn ||
+                !this.columns.prospectLastNameColumn ||
+                !this.columns.prospectTitleColum ||
+                !this.columns.subjectColumn ||
+                !this.columns.activityTypeColumn ||
+                !this.columns.commentsColumn ||
+                !this.columns.salesRepColumn ||
+                !this.columns.coOwnerColumn ||
+                !this.columns.accountIdColumn ||
+                !this.columns.contactIdColumn ||
+                !this.columns.activityIdColumn
               ) {
-                this.formattedRecap[repIndex].allActivities.meetings.push(
-                  this.createActivityObject(row)
+                this.throwError(
+                  'The provided file does not have the proper table headers.'
                 );
-              } else if (
-                //update
-                row[this.columns.subjectColumn]
-                  .toLowerCase()
-                  .includes('spoke') ||
-                (row[this.columns.subjectColumn]
-                  .toLowerCase()
-                  .includes('call') &&
-                  (row[this.columns.activityTypeColumn]
-                    .toLowerCase()
-                    .includes('call') ||
-                    row[this.columns.activityTypeColumn]
+                return;
+              }
+
+              let repIndex = this.formattedRecap.findIndex((recap) => {
+                //this.columns.salesRepColumn - need to determine when to reference salesRepColumn vs coOwner column
+                if (!row[this.columns.coOwnerColumn]) {
+                  return recap.salesRep === row[this.columns.salesRepColumn];
+                } else {
+                  return recap.salesRep === row[this.columns.coOwnerColumn];
+                }
+              });
+              if (repIndex === -1) {
+                this.formattedRecap.push({
+                  id: `recap-id-${rowIndex}`,
+                  salesRep:
+                    row[this.columns.coOwnerColumn] !== null
+                      ? row[this.columns.coOwnerColumn]
+                      : row[this.columns.salesRepColumn],
+                  allActivities: {
+                    meetings:
+                      row[this.columns.activityTypeColumn]
+                        .toLowerCase()
+                        .includes('meeting') ||
+                      row[this.columns.subjectColumn]
+                        .toLowerCase()
+                        .includes('meeting')
+                        ? [this.createActivityObject(row)]
+                        : [],
+                    spokes:
+                      row[this.columns.subjectColumn]
+                        .toLowerCase()
+                        .includes('spoke') ||
+                      (row[this.columns.subjectColumn]
+                        .toLowerCase()
+                        .includes('call') &&
+                        (row[this.columns.activityTypeColumn]
+                          .toLowerCase()
+                          .includes('call') ||
+                          row[this.columns.activityTypeColumn]
+                            .toLowerCase()
+                            .includes('spoke')))
+                        ? [this.createActivityObject(row)]
+                        : [],
+                    emailResponses: row[this.columns.subjectColumn]
                       .toLowerCase()
-                      .includes('spoke')))
-                // row[this.columns.subjectColumn].toLowerCase().includes('spoke')
-              ) {
-                this.formattedRecap[repIndex].allActivities.spokes.push(
-                  this.createActivityObject(row)
-                );
-              } else if (
-                row[this.columns.subjectColumn]
-                  .toLowerCase()
-                  .includes('email') ||
-                row[this.columns.subjectColumn]
-                  .toLowerCase()
-                  .includes('linkedin')
-              ) {
-                this.formattedRecap[repIndex].allActivities.emailResponses.push(
-                  this.createActivityObject(row)
-                );
-              } else if (
-                row[this.columns.subjectColumn]
-                  .toLowerCase()
-                  .includes('profiling')
-              ) {
-                this.formattedRecap[repIndex].allActivities.profiling.push(
-                  this.createActivityObject(row)
-                );
-              } else if (
-                row[this.columns.subjectColumn].toLowerCase().includes('rsvp')
-              ) {
-                this.formattedRecap[repIndex].allActivities.rsvps.push(
-                  this.createActivityObject(row)
-                );
+                      .includes('email')
+                      ? [this.createActivityObject(row)]
+                      : [],
+                    profiling: row[this.columns.subjectColumn]
+                      .toLowerCase()
+                      .includes('profiling')
+                      ? [this.createActivityObject(row)]
+                      : [],
+                    rsvps: row[this.columns.subjectColumn]
+                      .toLowerCase()
+                      .includes('rsvp')
+                      ? [this.createActivityObject(row)]
+                      : [],
+                    other: [],
+                  },
+                });
               } else {
-                this.formattedRecap[repIndex].allActivities.other.push(
-                  this.createActivityObject(row)
-                );
+                if (
+                  row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('meeting') ||
+                  row[this.columns.activityTypeColumn]
+                    .toLowerCase()
+                    .includes('meeting')
+                ) {
+                  this.formattedRecap[repIndex].allActivities.meetings.push(
+                    this.createActivityObject(row)
+                  );
+                } else if (
+                  //update
+                  row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('spoke') ||
+                  (row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('call') &&
+                    (row[this.columns.activityTypeColumn]
+                      .toLowerCase()
+                      .includes('call') ||
+                      row[this.columns.activityTypeColumn]
+                        .toLowerCase()
+                        .includes('spoke')))
+                  // row[this.columns.subjectColumn].toLowerCase().includes('spoke')
+                ) {
+                  this.formattedRecap[repIndex].allActivities.spokes.push(
+                    this.createActivityObject(row)
+                  );
+                } else if (
+                  row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('email') ||
+                  row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('linkedin')
+                ) {
+                  this.formattedRecap[
+                    repIndex
+                  ].allActivities.emailResponses.push(
+                    this.createActivityObject(row)
+                  );
+                } else if (
+                  row[this.columns.subjectColumn]
+                    .toLowerCase()
+                    .includes('profiling')
+                ) {
+                  this.formattedRecap[repIndex].allActivities.profiling.push(
+                    this.createActivityObject(row)
+                  );
+                } else if (
+                  row[this.columns.subjectColumn].toLowerCase().includes('rsvp')
+                ) {
+                  this.formattedRecap[repIndex].allActivities.rsvps.push(
+                    this.createActivityObject(row)
+                  );
+                } else {
+                  this.formattedRecap[repIndex].allActivities.other.push(
+                    this.createActivityObject(row)
+                  );
+                }
               }
             }
+          });
+        })
+        .then(() => {
+          const unassignedActivity = this.formattedRecap.findIndex((recap) => {
+            return recap.salesRep === 'New Logo Accounts';
+          });
+          if (unassignedActivity !== -1) {
+            this.hasUnassignedActivity = true;
+            this.showSuccess();
           }
+          this.hasFormattedRecap = true;
+        })
+        .catch((error) => {
+          console.log(error, 'Something went wrong.');
+          this.throwError('Something unexpected happened. Please try again.');
         });
-      })
-      .then(() => {
-        const unassignedActivity = this.formattedRecap.findIndex((recap) => {
-          return recap.salesRep === 'New Logo Accounts';
-        });
-        if (unassignedActivity !== -1) {
-          this.hasUnassignedActivity = true;
-          this.showSuccess();
-        }
-        this.hasFormattedRecap = true;
-      })
-      .catch((error) => {
-        console.log(error, 'Something went wrong.');
-        this.throwError('Something unexpected happened. Please try again.');
-      });
+    }
   }
 
   setupHeaders(cell: string, cellIndex: number): void {
