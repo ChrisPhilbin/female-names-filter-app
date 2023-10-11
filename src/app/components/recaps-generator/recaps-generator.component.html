@@ -2,6 +2,10 @@
   class="text-center pt-8 min-h-screen mb-auto pt-44"
   *ngIf="!hasFormattedRecap"
 >
+  <img
+    src="/assets/images/UKG-tagline_rgb.png"
+    class="h-1/4 w-1/4 ml-auto mr-auto mb-4"
+  />
   <p class="text-center font-bold text-4xl">BDR Nation Recap Generator</p>
   <input
     type="file"
@@ -49,7 +53,10 @@
             <span class="font-bold text-gray-700">
               <a
                 href="{{
-                  sfdcBaseUrl + '/Account/' + meeting.accountId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Account/' +
+                    meeting.accountId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ meeting.accountName }}</a
@@ -57,7 +64,10 @@
               -
               <a
                 href="{{
-                  sfdcBaseUrl + '/Contact/' + meeting.contactId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Contact/' +
+                    meeting.contactId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ meeting.prospectName }} - {{ meeting.prospectTitle }}</a
@@ -84,7 +94,10 @@
             <span class="font-bold text-gray-700"
               ><a
                 href="{{
-                  sfdcBaseUrl + '/Account/' + spoke.accountId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Account/' +
+                    spoke.accountId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ spoke.accountName }}</a
@@ -92,7 +105,10 @@
               -
               <a
                 href="{{
-                  sfdcBaseUrl + '/Contact/' + spoke.contactId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Contact/' +
+                    spoke.contactId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ spoke.prospectName }} - {{ spoke.prospectTitle }}</a
@@ -121,7 +137,10 @@
             <span class="font-bold text-gray-700"
               ><a
                 href="{{
-                  sfdcBaseUrl + '/Account/' + email.accountId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Account/' +
+                    email.accountId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ email.accountName }}</a
@@ -129,7 +148,10 @@
               -
               <a
                 href="{{
-                  sfdcBaseUrl + '/Contact/' + email.contactId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Contact/' +
+                    email.contactId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ email.prospectName }} - {{ email.prospectTitle }}</a
@@ -165,7 +187,10 @@
             <span class="font-bold text-gray-700"
               ><a
                 href="{{
-                  sfdcBaseUrl + '/Account/' + rsvp.accountId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Account/' +
+                    rsvp.accountId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ rsvp.accountName }}</a
@@ -173,7 +198,10 @@
               -
               <a
                 href="{{
-                  sfdcBaseUrl + '/Contact/' + rsvp.contactId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Contact/' +
+                    rsvp.contactId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ rsvp.prospectName }} - {{ rsvp.prospectTitle }}</a
@@ -203,7 +231,10 @@
             <span class="font-bold text-gray-700"
               ><a
                 href="{{
-                  sfdcBaseUrl + '/Account/' + profile.accountId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Account/' +
+                    profile.accountId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ profile.accountName }}</a
@@ -211,7 +242,10 @@
               -
               <a
                 href="{{
-                  sfdcBaseUrl + '/Contact/' + profile.contactId + '/view'
+                  recapService.sfdcBaseUrl +
+                    '/Contact/' +
+                    profile.contactId +
+                    '/view'
                 }}"
                 target="_blank"
                 >{{ profile.prospectName }} - {{ profile.prospectTitle }}</a

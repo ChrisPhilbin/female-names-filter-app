@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import readXlsxFile from 'read-excel-file';
+import { RecapService } from 'src/app/services/recap/recap.service';
 
 @Component({
   selector: 'app-recaps-generator',
@@ -9,7 +10,10 @@ import readXlsxFile from 'read-excel-file';
   providers: [MessageService],
 })
 export class RecapsGeneratorComponent implements OnInit {
-  constructor(private messageService: MessageService) {}
+  constructor(
+    private messageService: MessageService,
+    public recapService: RecapService
+  ) {}
 
   ngOnInit(): void {
     document.title = this.title;
@@ -17,7 +21,6 @@ export class RecapsGeneratorComponent implements OnInit {
     this.displayModal = true;
   }
 
-  sfdcBaseUrl = 'https://ukgsf.lightning.force.com/lightning/r';
   displayModal: boolean = false;
   title = 'BDR Recap Generator';
   canClick: boolean = false;
@@ -99,42 +102,42 @@ export class RecapsGeneratorComponent implements OnInit {
                       : row[this.columns.salesRepColumn],
                   allActivities: {
                     meetings:
-                      row[this.columns.activityTypeColumn]
-                        .toLowerCase()
-                        .includes('meeting') ||
-                      row[this.columns.subjectColumn]
-                        .toLowerCase()
-                        .includes('meeting')
+                      this.recapService.isActivityAMeeting(
+                        row[this.columns.activityTypeColumn]
+                      ) ||
+                      this.recapService.isActivityAMeeting(
+                        row[this.columns.subjectColumn]
+                      )
                         ? [this.createActivityObject(row)]
                         : [],
                     spokes:
-                      row[this.columns.subjectColumn]
-                        .toLowerCase()
-                        .includes('spoke') ||
-                      (row[this.columns.subjectColumn]
-                        .toLowerCase()
-                        .includes('call') &&
-                        (row[this.columns.activityTypeColumn]
-                          .toLowerCase()
-                          .includes('call') ||
+                      this.recapService.isActivityASpoke(
+                        row[this.columns.subjectColumn]
+                      ) ||
+                      (this.recapService.isActivityASpoke(
+                        row[this.columns.subjectColumn]
+                      ) &&
+                        (this.recapService.isActivityASpoke(
                           row[this.columns.activityTypeColumn]
-                            .toLowerCase()
-                            .includes('spoke')))
+                        ) ||
+                          this.recapService.isActivityASpoke(
+                            row[this.columns.activityTypeColumn]
+                          )))
                         ? [this.createActivityObject(row)]
                         : [],
-                    emailResponses: row[this.columns.subjectColumn]
-                      .toLowerCase()
-                      .includes('email')
+                    emailResponses: this.recapService.isActivityAEmail(
+                      row[this.columns.subjectColumn]
+                    )
                       ? [this.createActivityObject(row)]
                       : [],
-                    profiling: row[this.columns.subjectColumn]
-                      .toLowerCase()
-                      .includes('profiling')
+                    profiling: this.recapService.isActivityAProfile(
+                      row[this.columns.subjectColumn]
+                    )
                       ? [this.createActivityObject(row)]
                       : [],
-                    rsvps: row[this.columns.subjectColumn]
-                      .toLowerCase()
-                      .includes('rsvp')
+                    rsvps: this.recapService.isActivityARsvp(
+                      row[this.columns.subjectColumn]
+                    )
                       ? [this.createActivityObject(row)]
                       : [],
                     other: [],
@@ -142,42 +145,39 @@ export class RecapsGeneratorComponent implements OnInit {
                 });
               } else {
                 if (
-                  row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('meeting') ||
-                  row[this.columns.activityTypeColumn]
-                    .toLowerCase()
-                    .includes('meeting')
+                  this.recapService.isActivityAMeeting(
+                    row[this.columns.subjectColumn]
+                  ) ||
+                  this.recapService.isActivityAMeeting(
+                    row[this.columns.activityTypeColumn]
+                  )
                 ) {
                   this.formattedRecap[repIndex].allActivities.meetings.push(
                     this.createActivityObject(row)
                   );
                 } else if (
                   //update
-                  row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('spoke') ||
-                  (row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('call') &&
-                    (row[this.columns.activityTypeColumn]
-                      .toLowerCase()
-                      .includes('call') ||
+                  this.recapService.isActivityASpoke(
+                    row[this.columns.subjectColumn]
+                  ) ||
+                  (this.recapService.isActivityASpoke(
+                    row[this.columns.subjectColumn]
+                  ) &&
+                    (this.recapService.isActivityASpoke(
                       row[this.columns.activityTypeColumn]
-                        .toLowerCase()
-                        .includes('spoke')))
+                    ) ||
+                      this.recapService.isActivityASpoke(
+                        row[this.columns.activityTypeColumn]
+                      )))
                   // row[this.columns.subjectColumn].toLowerCase().includes('spoke')
                 ) {
                   this.formattedRecap[repIndex].allActivities.spokes.push(
                     this.createActivityObject(row)
                   );
                 } else if (
-                  row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('email') ||
-                  row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('linkedin')
+                  this.recapService.isActivityAEmail(
+                    row[this.columns.subjectColumn]
+                  )
                 ) {
                   this.formattedRecap[
                     repIndex
@@ -185,15 +185,17 @@ export class RecapsGeneratorComponent implements OnInit {
                     this.createActivityObject(row)
                   );
                 } else if (
-                  row[this.columns.subjectColumn]
-                    .toLowerCase()
-                    .includes('profiling')
+                  this.recapService.isActivityAProfile(
+                    row[this.columns.subjectColumn]
+                  )
                 ) {
                   this.formattedRecap[repIndex].allActivities.profiling.push(
                     this.createActivityObject(row)
                   );
                 } else if (
-                  row[this.columns.subjectColumn].toLowerCase().includes('rsvp')
+                  this.recapService.isActivityARsvp(
+                    row[this.columns.subjectColumn]
+                  )
                 ) {
                   this.formattedRecap[repIndex].allActivities.rsvps.push(
                     this.createActivityObject(row)
@@ -316,7 +318,7 @@ export class RecapsGeneratorComponent implements OnInit {
     emailBody = emailBody.slice(0, 200) + ``;
     return (
       emailBody +
-      `.... <a href="${this.sfdcBaseUrl}/Lead/${activityId}/view"><b>Link to full email</b></a>`
+      `.... <a href="${this.recapService.sfdcBaseUrl}/Lead/${activityId}/view" target="_blank"><b>Link to full email</b></a>`
     );
   }
 
